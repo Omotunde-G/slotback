@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your workspace — SlotBack</title>
+    <link rel="icon" type="image/png" href="/favicon.png?v=2">
+    <link rel="icon" type="image/png" href="/favicon.png?v=1">
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Young+Serif&display=swap"
+>
+<script src="/flyer.js" defer></script>
+<script src="/social-ui.js" defer></script>
+<script src="/publishing-ui.js" defer></script>
+<script src="/dashboard.js" defer></script>
+
+  </head>
+
+  <body>
+    <header class="site-header dashboard-header">
+      <a class="logo" href="/">SlotBack<span>.</span></a>
+
+     <div class="account-status">
+  <span id="connected-account" role="status">
+    Checking connection…
+  </span>
+
+  <form id="logout-form" action="/auth/logout" method="post" hidden>
+    <button class="button-secondary" type="submit">Log out</button>
+  </form>
+
+  <a
+    id="reconnect-buffer"
+    class="nav-link"
+    href="/auth/buffer"
+    hidden
+  >
+    Reconnect Buffer
+  </a>
+</div>
+    </header>
+
+    <main class="dashboard dashboard-layout">
+      <div class="dashboard-primary">
+        <p class="eyebrow">YOUR WORKSPACE</p>
+        <h1>Let’s fill that opening.</h1>
+        <p>Choose the workspace and channel you want to share through.</p>
+
+        <section class="connection-card" aria-labelledby="connection-title">
+          <h2 id="connection-title">Your publishing channel</h2>
+
+          <p id="connection-status" role="status" aria-live="polite">
+            Loading your Buffer connection…
+          </p>
+
+          <div class="field">
+            <label for="workspace">Buffer workspace</label>
+            <select id="workspace" disabled></select>
+          </div>
+
+          <div class="field">
+            <label for="channel">Social channel</label>
+            <select id="channel" disabled></select>
+          </div>
+
+          <p id="channel-selection"></p>
+        </section>
+
+        <section class="connection-card" aria-labelledby="opening-title">
+          <h2 id="opening-title">Create an opening</h2>
+          <p>Tell customers what’s available.</p>
+
+          <form id="opening-form">
+            <div class="field">
+              <label for="business-name">Business name</label>
+              <input
+                id="business-name"
+                name="businessName"
+                maxlength="120"
+                placeholder="The Corner Studio"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="service-name">Service</label>
+              <input
+                id="service-name"
+                name="serviceName"
+                maxlength="120"
+                placeholder="Haircut and beard trim"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="starts-at">Appointment date and time</label>
+              <input
+                id="starts-at"
+                name="startsAt"
+                type="datetime-local"
+                step="60"
+                aria-describedby="timezone-note"
+                required
+              />
+              <p id="timezone-note">Time zone: Lagos — WAT (UTC+1).</p>
+            </div>
+
+            <div class="field">
+              <label for="duration">Duration in minutes</label>
+              <input
+                id="duration"
+                name="durationMinutes"
+                type="number"
+                min="5"
+                max="1440"
+                step="1"
+                placeholder="45"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="price">Price in naira (₦)</label>
+              <input
+                id="price"
+                name="price"
+                type="number"
+                min="0"
+                max="9999999999.99"
+                step="0.01"
+                placeholder="8000"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="location">Location</label>
+              <input
+                id="location"
+                name="location"
+                maxlength="250"
+                placeholder="Ikeja, Lagos"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="description">Extra details (optional)</label>
+              <textarea
+                id="description"
+                name="description"
+                rows="3"
+                maxlength="1000"
+                placeholder="Anything the customer should know?"
+              ></textarea>
+            </div>
+
+            <p id="opening-message" role="status" aria-live="polite"></p>
+
+            <button class="button" type="submit">Preview opening →</button>
+          </form>
+        </section>
+
+        <section
+          class="connection-card"
+          id="opening-preview"
+          aria-labelledby="preview-title"
+          hidden
+        >
+          <p class="eyebrow">REVIEW YOUR OPENING</p>
+          <h2 id="preview-title">Does everything look right?</h2>
+          <p id="preview-content"></p>
+
+          <div class="flyer-preview">
+            <h3>Your social image</h3>
+
+            <canvas
+              id="opening-flyer"
+              width="1080"
+              height="1080"
+              role="img"
+              aria-label="Appointment announcement. Details are listed above."
+            ></canvas>
+
+            <a
+              id="download-flyer"
+              class="nav-link"
+              download="slotback-opening.jpg"
+            >
+              Download image →
+            </a>
+          </div>
+
+          <button class="button" id="save-opening" type="button">
+            Save opening
+          </button>
+
+          <p id="save-message" role="status" aria-live="polite"></p>
+
+          <a id="saved-opening-link" class="nav-link" hidden>
+            Open customer page →
+          </a>
+
+          <p>
+            <button id="save-flyer" class="button" type="button" hidden>
+              Send to Buffer
+            </button>
+          </p>
+
+          <p id="flyer-upload-message" role="status"></p>
+
+          <a
+            id="hosted-flyer-link"
+            class="nav-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            hidden
+          >
+            View saved flyer →
+          </a>
+        </section>
+      </div>
+
+      <aside class="owned-openings" aria-labelledby="owned-openings-title">
+  <h2 id="owned-openings-title">Your openings &amp; requests</h2>
+
+  <div id="opening-views" role="group" aria-label="Opening view" hidden>
+    <button type="button" data-opening-view="open" aria-pressed="true">
+      Open
+    </button>
+    <button type="button" data-opening-view="history" aria-pressed="false">
+      History
+    </button>
+  </div>
+
+  <button class="button" id="refresh-openings" type="button">
+    Refresh requests
+  </button>
+
+  <p id="owned-openings-message" role="status"></p>
+  <div id="owned-openings-list"></div>
+
+  <button class="button" id="load-more-openings" type="button" hidden>
+    Load more
+  </button>
+</aside>
+    </main>
+
+    <dialog
+      id="confirm-customer-dialog"
+      class="confirmation-dialog"
+      aria-labelledby="confirmation-title"
+      aria-describedby="confirmation-description"
+    >
+      <form method="dialog" class="confirmation-content">
+        <p class="eyebrow">CONFIRM BOOKING</p>
+
+        <h2 id="confirmation-title">Fill this opening?</h2>
+
+        <p id="confirmation-description"></p>
+
+        <div class="confirmation-notice">
+          Other pending requests will be declined and this opening will
+          close. Contact the selected customer yourself to arrange the
+          appointment.
+        </div>
+
+        <div class="confirmation-actions">
+          <button
+            class="button-secondary"
+            type="submit"
+            value="cancel"
+            autofocus
+          >
+            Keep reviewing
+          </button>
+
+          <button class="button" type="submit" value="confirm">
+            Confirm customer
+          </button>
+        </div>
+      </form>
+    </dialog>
+  <dialog
+  id="booking-email-dialog"
+  class="confirmation-dialog booking-review"
+  aria-labelledby="booking-email-title"
+  aria-describedby="booking-email-description"
+>
+  <form
+    id="booking-email-form"
+    class="confirmation-content booking-review__form"
+  >
+    <header class="booking-review__header">
+      <div>
+        <p class="booking-review__eyebrow">ONE OPENING. EVERYONE UPDATED.</p>
+
+        <h2 id="booking-email-title">Make it official.</h2>
+
+        <p id="booking-email-description">
+          Review both messages before confirming the appointment.
+        </p>
+      </div>
+
+      <button
+        class="booking-review__close"
+        type="submit"
+        formmethod="dialog"
+        formnovalidate
+        aria-label="Close email review"
+      >
+        &times;
+      </button>
+    </header>
+
+    <div class="booking-review__body">
+      <!-- Business reply email -->
+      <section
+        class="booking-review__sender"
+        aria-labelledby="booking-reply-title"
+      >
+        <div class="booking-review__section-heading">
+          <div>
+            <h3 id="booking-reply-title">Where should replies go?</h3>
+            <p>
+              SlotBack sends the emails. Customer replies go to your business.
+            </p>
+          </div>
+        </div>
+
+        <div class="booking-review__sender-row">
+          <span id="booking-email-sender"></span>
+
+          <button
+            id="booking-sender-badge"
+            class="sender-badge"
+            type="button"
+            aria-label="Set or change your business reply email"
+          >
+            Verification pending
+          </button>
+        </div>
+
+        <div id="booking-sender-editor" class="field" hidden>
+          <label for="booking-sender-input">Business reply email</label>
+
+          <div class="booking-review__inline-controls">
+            <input
+              id="booking-sender-input"
+              type="email"
+              autocomplete="email"
+              maxlength="254"
+              placeholder="you@yourbusiness.com"
+            >
+
+            <button
+              id="review-booking-sender"
+              class="button-secondary"
+              type="button"
+            >
+              Send verification code
+            </button>
+          </div>
+
+          <div
+            id="booking-sender-confirmation"
+            class="booking-review__notice"
+            hidden
+          >
+            <p id="booking-sender-question"></p>
+
+            <button
+              id="save-booking-sender"
+              class="button"
+              type="button"
+            >
+              Yes, send the code
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="booking-reply-verification"
+          class="booking-review__verification"
+          hidden
+        >
+          <div class="field">
+            <label for="booking-reply-code">
+              Enter your six-digit verification code
+            </label>
+
+            <div class="booking-review__inline-controls">
+              <input
+                id="booking-reply-code"
+                type="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                placeholder="000000"
+              >
+
+              <button
+                id="verify-booking-reply-code"
+                class="button"
+                type="button"
+              >
+                Verify email
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <p id="booking-sender-message" role="status"></p>
+      </section>
+
+      <!-- Selected customer -->
+      <fieldset class="booking-review__email booking-review__email--selected">
+        <legend>
+          <span class="booking-review__step">01</span>
+          Selected customer
+        </legend>
+
+        <div class="booking-review__recipient">
+          <span class="booking-review__label">CONFIRMATION GOES TO</span>
+          <p id="confirmed-email-recipient"></p>
+        </div>
+
+        <div class="field">
+          <label for="confirmed-email-subject">Email subject</label>
+          <input
+            id="confirmed-email-subject"
+            name="confirmedSubject"
+            value="Your appointment is confirmed"
+            maxlength="160"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="confirmed-email-body">Your message</label>
+
+          <textarea
+            id="confirmed-email-body"
+            name="confirmedBody"
+            rows="8"
+            maxlength="5000"
+            aria-describedby="confirmed-email-help"
+            required
+          ></textarea>
+
+          <p id="confirmed-email-help" class="booking-review__hint">
+            Check the appointment details and add any arrival instructions.
+          </p>
+        </div>
+      </fieldset>
+
+      <!-- Other applicants -->
+      <fieldset
+        id="other-applicants-email"
+        class="booking-review__email"
+      >
+        <legend>
+          <span class="booking-review__step">02</span>
+          Other applicants
+        </legend>
+
+        <div class="booking-review__recipient">
+          <span class="booking-review__label">SLOT-FILLED UPDATE</span>
+          <p id="declined-email-recipient-count"></p>
+        </div>
+
+        <p class="booking-review__explanation">
+          Each person receives a separate email. Their addresses stay private.
+        </p>
+
+        <div class="field">
+          <label for="declined-email-subject">Email subject</label>
+          <input
+            id="declined-email-subject"
+            name="declinedSubject"
+            value="This opening has been filled"
+            maxlength="160"
+          >
+        </div>
+
+        <div class="field">
+          <label for="declined-email-body">Your message</label>
+
+          <textarea
+            id="declined-email-body"
+            name="declinedBody"
+            rows="6"
+            maxlength="5000"
+            aria-describedby="declined-email-help"
+          ></textarea>
+
+          <p id="declined-email-help" class="booking-review__hint">
+            Add a booking link or explain how they can arrange another time.
+          </p>
+        </div>
+      </fieldset>
+    </div>
+
+    <footer class="booking-review__footer">
+      <p id="booking-email-status" role="status"></p>
+
+      <div class="booking-review__footer-row">
+        <p class="booking-review__footer-note">
+          Confirming closes this opening to new requests.
+        </p>
+
+        <div class="confirmation-actions">
+          <button
+            class="button-secondary"
+            type="submit"
+            formmethod="dialog"
+            formnovalidate
+          >
+            Cancel
+          </button>
+
+          <button
+            id="confirm-and-notify"
+            class="button"
+            type="submit"
+            disabled
+          >
+            Confirm &amp; notify
+          </button>
+        </div>
+      </div>
+    </footer>
+  </form>
+</dialog>
+  </body>
+</html>
